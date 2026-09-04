@@ -4,6 +4,7 @@
 API Key 僅存在伺服器環境變數，不暴露到瀏覽器。
 """
 import os
+import json
 from typing import Optional
 
 import pandas as pd
@@ -128,8 +129,9 @@ def analyze(req: AnalyzeRequest):
         "news": df_records(analyzer._fetch_news(days=5)),
         "news_analysis": analyzer.get_news_analysis(days=5),
         "ai_analysis": analyzer.get_ai_prediction_text(),
-        # Plotly Figure 可直接轉成 JSON，前端用 Plotly.newPlot() 顯示。
-        "plot": plot.to_plotly_json(),
+        # 使用 Plotly 自己的 JSON encoder，避免 NumPy / pandas / NaN / Timestamp
+        # 直接交給 FastAPI JSONResponse 時造成 500 Internal Server Error。
+        "plot": json.loads(plot.to_json()),
     }
 
 
