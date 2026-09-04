@@ -7,6 +7,7 @@ import os
 from typing import Optional
 
 import pandas as pd
+import numpy as np
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
@@ -42,11 +43,26 @@ class WatchlistRequest(BaseModel):
 
 
 def df_records(df: pd.DataFrame):
+    """Convert a DataFrame into strict JSON-safe Python values.
+
+    Important: pandas/numpy NaN and +/-inf cannot be emitted by Starlette's
+    JSONResponse. Convert them to JSON null (Python None) first.
+    """
     if df is None or df.empty:
         return []
-    clean = df.copy()
+
+    clean = df.copy().replace([np.inf, -np.inf], np.nan).astype(object)
     clean = clean.where(pd.notna(clean), None)
-    return clean.to_dict(orient="records")
+    records = clean.to_dict(orient="records")
+
+    for row in records:
+        for key, value in row.items():
+            if isinstance(value, (float, np.floating)):
+                row[key] = float(value) if np.isfinite(value) else None
+            elif isinstance(value, np.integer):
+                row[key] = int(value)
+
+    return records
 
 
 @app.get("/")
