@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>想法日記</title>
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>想法日記</h1>
+  <button id="settingsBtn" title="設定">⚙</button>
+</header>
+
+<main>
+  <section class="card">
+    <textarea id="text" rows="4" placeholder="現在腦中在想什麼？"></textarea>
+    <input id="tags" placeholder="標籤（用逗號分隔，例如：工作,投資）">
+    <button id="addBtn" class="primary">記下來</button>
+  </section>
+
+  <input id="search" placeholder="搜尋想法或標籤…">
+  <div id="list"></div>
+</main>
+
+<dialog id="settings">
+  <form method="dialog">
+    <h2>設定</h2>
+    <label>Claude API key（只存在這個瀏覽器）
+      <input id="apiKey" type="password" placeholder="sk-ant-...">
+    </label>
+    <label>模型
+      <input id="model" value="claude-sonnet-5-5">
+    </label>
+    <p class="hint">沒填 key 時，分析會顯示示範內容。按「分析」時，只有那一則想法會送到 Anthropic。</p>
+    <div class="row">
+      <button type="button" id="exportBtn">匯出 JSON</button>
+      <label class="filebtn">匯入 JSON<input type="file" id="importFile" accept=".json" hidden></label>
+      <button id="saveSettings" class="primary">儲存</button>
+    </div>
+  </form>
+</dialog>
+
+<script src="app.js"></script>
+</body>
+</html>
